@@ -3,10 +3,7 @@ package com.Springboot.Employee.rest;
 import com.Springboot.Employee.dao.EmployeedaoImpl;
 import com.Springboot.Employee.entity.Employee;
 import com.Springboot.Employee.service.EmployeeService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,4 +30,25 @@ public class EmployeeRestController {
             return theEmployee;
         }
     }
+    @PostMapping("/employ/{employeeid}")
+    public Employee addEmployee(@RequestBody Employee theEmployee) {
+        theEmployee.setId(0);
+        Employee dbemployee=employeeService.save(theEmployee);
+        return dbemployee;
+    }
+    @PutMapping("/employ")
+    public Employee updateEmployee(@RequestBody Employee theEmployee){
+        Employee dbEmployee = employeeService.save(theEmployee);
+        return dbEmployee;
+    }
+    @DeleteMapping("/employ")
+    public String DeleteEmployee(@PathVariable int eid ){
+        Employee theEmployee=employeeService.findById(eid);
+        if (theEmployee==null){
+            throw new RuntimeException("employee not found");
+        }
+        employeeService.deleteById(eid);
+        return "Deleted employee id-" +eid;
+    }
 }
+
