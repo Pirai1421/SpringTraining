@@ -28,9 +28,8 @@ public class Order {
     @PrePersist
     @PreUpdate
     private void calculateTotalPrice() {
-        totalPrice = menuItems.stream().mapToDouble(MenuItem::getPrice).sum();
+        totalPrice = menuItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
     }
-
 
     public Order() {
     }
@@ -40,7 +39,6 @@ public class Order {
         this.menuItems = menuItems;
         calculateTotalPrice();
     }
-
 
     public long getId() {
         return id;

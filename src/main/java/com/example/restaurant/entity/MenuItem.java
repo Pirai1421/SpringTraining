@@ -15,7 +15,9 @@ public class MenuItem {
     @Column(name = "price")
     private double price;
 
-    // Constructors
+    @Transient
+    private int quantity; // Add this field
+
     public MenuItem() {
     }
 
@@ -24,7 +26,6 @@ public class MenuItem {
         this.price = price;
     }
 
-    // Getters and setters
     public long getId() {
         return id;
     }
@@ -43,5 +44,13 @@ public class MenuItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

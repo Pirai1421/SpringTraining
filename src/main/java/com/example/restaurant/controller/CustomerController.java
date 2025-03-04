@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/customer")
@@ -40,20 +41,29 @@ public class CustomerController {
         return menuItemService.findAll();
     }
 
+
     @PostMapping("/menu/add")
     public MenuItem addMenuItem(@RequestBody MenuItem menuItem) {
         return menuItemService.save(menuItem);
     }
 
+
     @PostMapping("/{customerId}/order")
-    public Order placeOrder(@PathVariable long customerId, @RequestBody List<Long> menuItemIds) {
+    public Order placeOrder(@PathVariable long customerId, @RequestBody List<MenuItem> menuItems) {
         Customer customer = customerService.findById(customerId);
-        List<MenuItem> menuItems = menuItemService.findAllById(menuItemIds);
+        List<MenuItem> fullMenuItems = menuItems.stream()
+                .map(item -> {
+                    MenuItem fullItem = menuItemService.findById(item.getId());
+                    fullItem.setQuantity(item.getQuantity());
+                    return fullItem;
+                })
+                .collect(Collectors.toList());
         Order order = new Order();
         order.setCustomer(customer);
-        order.setMenuItems(menuItems);
+        order.setMenuItems(fullMenuItems);
         return orderService.save(order);
     }
+
 
     @GetMapping("/{customerId}/orders")
     public List<Order> getCustomerOrders(@PathVariable long customerId) {
