@@ -16,7 +16,7 @@ public class MenuItem {
     private double price;
 
     @Transient
-    private int quantity; // Add this field
+    private int quantity;
 
     public MenuItem() {
     }
@@ -53,4 +53,5 @@ public class MenuItem {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
 }
