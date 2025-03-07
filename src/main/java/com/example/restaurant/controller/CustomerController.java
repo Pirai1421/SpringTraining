@@ -6,9 +6,9 @@ import com.example.restaurant.entity.Order;
 import com.example.restaurant.service.CustomerServiceImpl;
 import com.example.restaurant.service.MenuItemServiceImpl;
 import com.example.restaurant.service.OrderServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/customer")
+@Tag(name = "Customer", description = "Customer management APIs")
 public class CustomerController {
-
     private final CustomerServiceImpl customerService;
     private final MenuItemServiceImpl menuItemService;
     private final OrderServiceImpl orderService;
@@ -29,34 +29,31 @@ public class CustomerController {
         this.orderService = orderService;
     }
 
-    //GETTING THE LIST OF CUSTOMER
+    @Operation(summary = "Get all customers")
     @GetMapping("/all")
     public List<Customer> findAll() {
         return customerService.findAll();
     }
 
-
-    //ADDING THE CUSTOMER DETAILS WITH THE NAME, BASICALLY CREATING CUSTOMER OBJECT and saving it into the database...
+    @Operation(summary = "Add a new customer")
     @PostMapping("/add")
     public Customer addCustomer(@RequestBody Customer customer) {
         return customerService.save(customer);
     }
 
-    //GETTING THE LIST OF ITEM IN THE MENU
-
+    @Operation(summary = "Get all menu items")
     @GetMapping("/menu")
     public List<MenuItem> getMenu() {
         return menuItemService.findAll();
     }
 
-    //ADDING THE ITEMS WITH THEIR PRICES IN THE MENU
+    @Operation(summary = "Add a new menu item")
     @PostMapping("/menu/add")
     public MenuItem addMenuItem(@RequestBody MenuItem menuItem) {
         return menuItemService.save(menuItem);
     }
 
-    //POST THE LIST OF ITEM WITH THEIR ID
-
+    @Operation(summary = "Place an order")
     @PostMapping("/{customerId}/order")
     public Order placeOrder(@PathVariable long customerId, @RequestBody List<MenuItem> menuItems) {
         Customer customer = customerService.findById(customerId);
@@ -73,33 +70,36 @@ public class CustomerController {
         return orderService.save(order);
     }
 
-    //GETTING THE LIST OF ITEMS
+    @Operation(summary = "Get all orders for a customer")
     @GetMapping("/{customerId}/orders")
     public List<Order> getCustomerOrders(@PathVariable long customerId) {
         return orderService.findByCustomerId(customerId);
     }
 
-    //MAKE CHANGE TO THE ITEMS LIST
+    @Operation(summary = "Change an order")
     @PutMapping("/{customerId}/orderchange")
-    public Order ChangeOrder(@PathVariable long customerId,@RequestBody List<MenuItem> menuItems){
-        Customer customer=customerService.findById(customerId);
-        List<MenuItem> ChangeMenuItems=menuItems.stream().map(items -> {
-            MenuItem ChangeItem=menuItemService.findById(items.getId());
-            ChangeItem.setQuantity(items.getQuantity());
-            return ChangeItem;
+    public Order changeOrder(@PathVariable long customerId, @RequestBody List<MenuItem> menuItems) {
+        Customer customer = customerService.findById(customerId);
+        List<MenuItem> changeMenuItems = menuItems.stream().map(items -> {
+            MenuItem changeItem = menuItemService.findById(items.getId());
+            changeItem.setQuantity(items.getQuantity());
+            return changeItem;
         }).collect(Collectors.toList());
-        Order order=new Order();
+        Order order = new Order();
         order.setCustomer(customer);
-        order.setMenuItems(ChangeMenuItems);
+        order.setMenuItems(changeMenuItems);
         return orderService.save(order);
-
     }
+
+    @Operation(summary = "Delete a customer")
     @DeleteMapping("/{customerId}")
-    public Customer DeleteCustomer(@PathVariable long customerId){
-        Customer customer=customerService.findById(customerId);
-        customerService.deleteById(customerId);
-        return customer;
-
-
+    public Customer deleteCustomer(@PathVariable long customerId) {
+        Customer customer = customerService.findById(customerId);
+        if (customer != null) {
+            customerService.deleteById(customerId);
+            return customer;
+        } else {
+            throw new RuntimeException("Customer not found with id: " + customerId);
+        }
     }
 }

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface OrderDao extends JpaRepository<Order, Long> {
     List<Order> findByCustomerId(long customerId);
+
+    void deleteByCustomerId(long id);
 }

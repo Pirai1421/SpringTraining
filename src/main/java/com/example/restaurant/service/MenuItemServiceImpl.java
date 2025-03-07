@@ -18,23 +18,23 @@ public class MenuItemServiceImpl {
     public MenuItemServiceImpl(MenuItemDao menuItemDao) {
         this.menuItemDao = menuItemDao;
     }
-    @Cacheable(value = "menuItems")
+    @Cacheable(value = "menuItems",cacheManager = "menuItemsCacheManager")
     public List<MenuItem> findAll() {
         return menuItemDao.findAll();
     }
-    @Cacheable(value = "menuItems",key = "#id")
+    @Cacheable(value = "menuItems",key = "#id",cacheManager = "menuItemsCacheManager")
     public MenuItem findById(long id) {
         return menuItemDao.findById(id).orElse(null);
     }
 
     @Transactional
-    @Cacheable(value = "menuItems")
+    @Cacheable(value = "menuItems",cacheManager = "menuItemsCacheManager")
     public MenuItem save(MenuItem menuItem) {
         return menuItemDao.save(menuItem);
     }
 
     @Transactional
-    @CacheEvict(value = "menuItems",key = "#id")
+    @CacheEvict(value = "menuItems",key = "#id",cacheManager = "menuItemsCacheManager")
     public void deleteById(long id) {
         menuItemDao.deleteById(id);
     }
