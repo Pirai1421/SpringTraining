@@ -3,9 +3,11 @@ package com.example.restaurant.controller;
 import com.example.restaurant.entity.Customer;
 import com.example.restaurant.entity.MenuItem;
 import com.example.restaurant.entity.Order;
+import com.example.restaurant.entity.Employee;
 import com.example.restaurant.service.CustomerServiceImpl;
 import com.example.restaurant.service.MenuItemServiceImpl;
 import com.example.restaurant.service.OrderServiceImpl;
+import com.example.restaurant.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +23,14 @@ public class CustomerController {
     private final CustomerServiceImpl customerService;
     private final MenuItemServiceImpl menuItemService;
     private final OrderServiceImpl orderService;
+    private final EmployeeService employeeService;
 
     @Autowired
-    public CustomerController(CustomerServiceImpl customerService, MenuItemServiceImpl menuItemService, OrderServiceImpl orderService) {
+    public CustomerController(CustomerServiceImpl customerService, MenuItemServiceImpl menuItemService, OrderServiceImpl orderService, EmployeeService employeeService) {
         this.customerService = customerService;
         this.menuItemService = menuItemService;
         this.orderService = orderService;
+        this.employeeService = employeeService;
     }
 
     @Operation(summary = "Get all customers")
@@ -55,8 +59,9 @@ public class CustomerController {
 
     @Operation(summary = "Place an order")
     @PostMapping("/{customerId}/order")
-    public Order placeOrder(@PathVariable long customerId, @RequestBody List<MenuItem> menuItems) {
+    public Order placeOrder(@PathVariable long customerId, @RequestParam int employeeId, @RequestBody List<MenuItem> menuItems) {
         Customer customer = customerService.findById(customerId);
+        Employee employee = employeeService.getEmployeeDetails(employeeId);
         List<MenuItem> fullMenuItems = menuItems.stream()
                 .map(item -> {
                     MenuItem fullItem = menuItemService.findById(item.getId());
@@ -66,6 +71,7 @@ public class CustomerController {
                 .collect(Collectors.toList());
         Order order = new Order();
         order.setCustomer(customer);
+        order.setEmployee(employee);
         order.setMenuItems(fullMenuItems);
         return orderService.save(order);
     }
@@ -78,8 +84,9 @@ public class CustomerController {
 
     @Operation(summary = "Change an order")
     @PutMapping("/{customerId}/orderchange")
-    public Order changeOrder(@PathVariable long customerId, @RequestBody List<MenuItem> menuItems) {
+    public Order changeOrder(@PathVariable long customerId, @RequestParam int employeeId, @RequestBody List<MenuItem> menuItems) {
         Customer customer = customerService.findById(customerId);
+        Employee employee = employeeService.getEmployeeDetails(employeeId);
         List<MenuItem> changeMenuItems = menuItems.stream().map(items -> {
             MenuItem changeItem = menuItemService.findById(items.getId());
             changeItem.setQuantity(items.getQuantity());
@@ -87,6 +94,7 @@ public class CustomerController {
         }).collect(Collectors.toList());
         Order order = new Order();
         order.setCustomer(customer);
+        order.setEmployee(employee);
         order.setMenuItems(changeMenuItems);
         return orderService.save(order);
     }

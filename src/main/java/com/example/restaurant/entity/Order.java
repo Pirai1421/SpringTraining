@@ -1,6 +1,8 @@
 package com.example.restaurant.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.util.List;
 
 @Entity
@@ -13,6 +15,10 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Transient
+    private Employee employee; // Add employee field
 
     @ManyToMany
     @JoinTable(
@@ -31,15 +37,7 @@ public class Order {
         totalPrice = menuItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
     }
 
-    public Order() {
-    }
-
-    public Order(Customer customer, List<MenuItem> menuItems) {
-        this.customer = customer;
-        this.menuItems = menuItems;
-        calculateTotalPrice();
-    }
-
+    // Getters and Setters
     public long getId() {
         return id;
     }
@@ -50,6 +48,14 @@ public class Order {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public List<MenuItem> getMenuItems() {
