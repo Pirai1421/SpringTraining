@@ -6,7 +6,7 @@ public class Employee {
     private String lastName;
     private String email;
 
-    // Getters and Setters
+
     public int getId() {
         return id;
     }

@@ -11,7 +11,10 @@ import com.example.restaurant.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -110,4 +113,20 @@ public class CustomerController {
             throw new RuntimeException("Customer not found with id: " + customerId);
         }
     }
+    @Operation(summary = "Add a new employee")
+    @PostMapping("/employee/add")
+    public Employee addEmployee(@RequestBody Employee employee) {
+
+        return employeeService.addEmployee(employee);
+
+    }
+
+    @Operation(summary = "Update an employee")
+    @PutMapping("/employee/update")
+    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
+
+        return employeeService.updateEmployee(employee);
+
+    }
+
 }
